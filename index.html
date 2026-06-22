@@ -18,9 +18,64 @@
             font-family: 'Poppins', sans-serif;
             background: #0a0a0f;
             min-height: 100vh;
-            overflow-y: auto; /* Aşağı-yuxarı getmə aktiv edildi */
-            overflow-x: hidden; /* Sağa-sola lazımsız sürüşmələrin qarşısı alındı */
+            overflow-y: hidden; /* Animasiya bitənə qədər scroll gizli qalacaq */
+            overflow-x: hidden;
             color: white;
+        }
+
+        /* Giriş Animasiyası (İntro) Üçün Stiller */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+        }
+
+        .intro-text {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 6vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 25%, #4facfe 50%, #00f2fe 75%, #f093fb 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-align: center;
+            /* Rəng dəyişimi və buxarlanma effekti eyni anda işləyir */
+            animation: gradientShift 2s ease-in-out infinite, evaporate 3.5s forwards ease-in;
+        }
+
+        /* Buxarlanma və Böyümə Effekti */
+        @keyframes evaporate {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+                filter: blur(10px);
+            }
+            20% {
+                transform: scale(1);
+                opacity: 1;
+                filter: blur(0px);
+            }
+            60% {
+                transform: scale(1.3);
+                opacity: 1;
+                filter: blur(0px);
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+                filter: blur(25px); /* Buxar kimi yox olma effekti */
+            }
         }
 
         /* Parçacıqlar üçün canvas */
@@ -84,7 +139,7 @@
             justify-content: center;
             min-height: 100vh;
             padding: 2rem;
-            padding-bottom: 8rem; /* Səhifənin altında sabit panellər üçün boşluq */
+            padding-bottom: 8rem;
             text-align: center;
         }
 
@@ -373,7 +428,6 @@
 
         .close-modal:hover { color: white; }
 
-        /* Mobil ekranlar üçün uyğunlaşdırma */
         @media (max-width: 640px) {
             .active-workers {
                 top: 1rem;
@@ -382,7 +436,7 @@
                 padding: 0.4rem 0.8rem;
             }
             .audio-control {
-                bottom: 5rem; /* Status bar ilə toqquşmasın */
+                bottom: 5rem;
                 left: 1rem;
             }
             .status-bar {
@@ -393,6 +447,10 @@
     </style>
 </head>
 <body>
+
+    <div id="intro-overlay">
+        <h1 class="intro-text">Səfər İmanzadə</h1>
+    </div>
 
     <audio id="bg-music" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 
@@ -467,6 +525,24 @@
     </div>
 
     <script>
+        // =============================================
+        // GİRİŞ ANİMASİYASI KONTROLU
+        // =============================================
+        window.addEventListener('load', () => {
+            // Animasiya müddəti (3.5 saniyə) bitdikdən sonra pəncərəni yox et
+            setTimeout(() => {
+                const introOverlay = document.getElementById('intro-overlay');
+                introOverlay.style.opacity = '0';
+                introOverlay.style.visibility = 'hidden';
+                
+                // Overlay silindikdən sonra saytda aşağı-yuxarı scroll etməyə icazə ver
+                document.body.style.overflowY = 'auto';
+                
+                // Tam yox olduqdan sonra DOM-dan sil
+                setTimeout(() => introOverlay.remove(), 1000);
+            }, 3300); // Buxar effekti bitən ərəfədə ekran aradan qalxır
+        });
+
         // =============================================
         // ARXA PLAN MUSİQİSİ FUNKSİYALARI
         // =============================================
